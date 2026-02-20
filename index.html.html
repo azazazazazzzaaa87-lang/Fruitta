@@ -1,0 +1,1660 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🔥 Fruita Ultimate Pro | فرویتا اولتیمیت پرو</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap');
+
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-highlight: rgba(255, 255, 255, 0.4);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.8);
+  --gold: #ffd700;
+  --gold-glow: 0 0 25px rgba(255, 215, 0, 0.7);
+  --green: #00ff88;
+  --green-glow: 0 0 20px rgba(0, 255, 136, 0.6);
+  --red: #ff4757;
+  --purple: #a55eea;
+  --blue: #4dabf7;
+  --orange: #ffa502;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #0f0c29;
+  font-family: 'Vazirmatn', sans-serif;
+  color: var(--text-primary);
+  touch-action: none;
+  transition: background 0.6s ease-in-out;
+}
+
+#bg-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  display: block;
+  opacity: 0.8;
+}
+
+#game-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;  z-index: 1;
+  display: block;
+}
+
+#ui-layer {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hud {
+  position: absolute;
+  top: 15px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-sizing: border-box;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.hud-item {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 12px 24px;
+  border-radius: 25px;
+  border: 1px solid var(--glass-border);
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  pointer-events: auto;
+  transition: all 0.3s ease;
+}
+
+.hud-item.pulse { animation: hudPulse 0.5s ease; }
+@keyframes hudPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+.score-text { color: #fff; }
+.lives-text { color: var(--red); text-shadow: 0 0 15px rgba(255, 71, 87, 0.7); }
+.coins-text { color: var(--gold); text-shadow: var(--gold-glow); }
+.combo-text { color: var(--orange); text-shadow: 0 0 15px rgba(255, 165, 2, 0.7); }
+
+.power-bar-container {
+  position: absolute;  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 340px;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 15px;
+  border: 2px solid var(--glass-border);
+  overflow: hidden;
+  pointer-events: none;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.7);
+}
+
+.power-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #a55eea 0%, #4dabf7 30%, #00ff88 60%, #ffd700 100%);
+  transition: width 0.2s ease-out;
+  box-shadow: 0 0 20px rgba(165, 94, 234, 0.8);
+  position: relative;
+  overflow: hidden;
+}
+
+.power-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer { 100% { left: 100%; } }
+
+.power-bar-text {
+  position: absolute;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 13px;
+  color: var(--purple);
+  font-weight: 800;
+  text-shadow: 0 0 10px rgba(165, 94, 234, 0.7);
+  letter-spacing: 1px;
+}
+
+.power-ready {
+  animation: powerReady 0.5s ease infinite alternate;
+}
+@keyframes powerReady {
+  from { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+  to { box-shadow: 0 0 40px rgba(255, 215, 0, 1), 0 0 60px rgba(255, 215, 0, 0.6); }
+}
+
+.overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+  overflow-y: auto;
+  padding: 20px;
+  pointer-events: auto;
+  animation: menuFadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes menuFadeIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.overlay.hidden { display: none !important; }
+
+.game-title {
+  font-size: 65px;
+  margin: 0 0 10px 0;
+  background: linear-gradient(135deg, #fff 0%, var(--gold) 40%, var(--purple) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 900;
+  text-align: center;
+  text-shadow: 0 5px 30px rgba(0, 0, 0, 0.8);
+  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
+}
+
+.creator-name {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 22px;
+  border-radius: 25px;
+  border: 1px solid var(--glass-border);  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.game-subtitle {
+  font-size: 17px;
+  color: var(--text-secondary);
+  margin-bottom: 30px;
+  text-align: center;
+  max-width: 550px;
+  line-height: 1.7;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+}
+
+.btn {
+  padding: 18px 50px;
+  font-size: 19px;
+  font-family: 'Vazirmatn', sans-serif;
+  font-weight: 800;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  margin: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  pointer-events: auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.btn:hover::before { left: 100%; }
+.btn:hover { transform: translateY(-5px) scale(1.03); }
+.btn:active { transform: scale(0.97); }
+.btn-start { 
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 50%, #00d26a 100%);
+  box-shadow: 0 8px 30px rgba(0, 210, 106, 0.5);
+}
+.btn-start:hover { box-shadow: var(--green-glow), 0 15px 50px rgba(0, 210, 106, 0.7); }
+
+.btn-shop {   background: linear-gradient(135deg, #f12711 0%, #f5af19 50%, #ffd700 100%);
+  box-shadow: 0 8px 30px rgba(255, 165, 2, 0.5);
+}
+.btn-shop:hover { box-shadow: var(--gold-glow), 0 15px 50px rgba(255, 165, 2, 0.7); }
+
+.btn-stats { 
+  background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 50%, #4dabf7 100%);
+  box-shadow: 0 8px 30px rgba(77, 171, 247, 0.5);
+}
+.btn-stats:hover { box-shadow: 0 0 25px rgba(77, 171, 247, 0.8), 0 15px 50px rgba(77, 171, 247, 0.6); }
+
+.btn-mission { 
+  background: linear-gradient(135deg, #a55eea 0%, #9733ee 50%, #da22ff 100%);
+  box-shadow: 0 8px 30px rgba(165, 94, 234, 0.5);
+}
+.btn-mission:hover { box-shadow: 0 0 25px rgba(165, 94, 234, 0.8), 0 15px 50px rgba(165, 94, 234, 0.6); }
+
+.btn-back { 
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+}
+.btn-back:hover { background: rgba(255, 255, 255, 0.25); }
+
+.menu-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+#final-score {
+  font-size: 26px;
+  margin-bottom: 30px;
+  color: #fff;
+  display: none;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(15px);
+  padding: 25px 50px;
+  border-radius: 25px;
+  border: 2px solid var(--glass-border);
+  text-align: center;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.7);
+  animation: scorePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes scorePop {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }}
+
+#final-score div { margin: 10px 0; font-weight: 800; }
+
+.shop-header, .stats-header, .mission-header {
+  text-align: center;
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.section-title {
+  font-size: 42px;
+  margin: 0 0 20px 0;
+  background: linear-gradient(135deg, #fff, var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 900;
+  text-shadow: 0 3px 20px rgba(0, 0, 0, 0.8);
+}
+
+.shop-coins-display {
+  font-size: 24px;
+  color: var(--gold);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(15px);
+  padding: 14px 35px;
+  border-radius: 35px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  border: 2px solid var(--gold);
+  font-weight: 800;
+  box-shadow: var(--gold-glow);
+}
+
+.shop-grid, .sword-grid {
+  display: grid;
+  /* ✅ تغییر: کارت‌های کوچکتر و تعداد بیشتر در هر ردیف */
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin-bottom: 30px;
+  width: 100%;
+  max-width: 900px;
+  max-height: 55vh;
+  overflow-y: auto;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  border-radius: 25px;  border: 2px solid var(--glass-border);
+}
+
+.shop-grid::-webkit-scrollbar, .sword-grid::-webkit-scrollbar { width: 8px; }
+.shop-grid::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); border-radius: 10px; }
+.shop-grid::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 10px; }
+.shop-grid::-webkit-scrollbar-thumb:hover { background: #b87df5; }
+
+.theme-card, .sword-card, .item-card {
+  background: var(--glass-bg);
+  border: 2px solid var(--glass-border);
+  border-radius: 20px;
+  /* ✅ تغییر: پدینگ کمتر و ارتفاع کمتر */
+  padding: 10px 8px;
+  text-align: center;
+  cursor: pointer;
+  backdrop-filter: blur(15px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 140px; /* ✅ کاهش ارتفاع */
+  width: 100%;
+}
+
+.theme-card::before, .sword-card::before, .item-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,255,255,0.15) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.theme-card:hover::before, .sword-card:hover::before, .item-card:hover::before { opacity: 1; }
+
+.theme-card:hover, .sword-card:hover, .item-card:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-7px) scale(1.02);
+  border-color: var(--glass-highlight);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+}
+
+.theme-card.active, .sword-card.active, .item-card.active {
+  border: 3px solid var(--gold);
+  background: rgba(255, 215, 0, 0.15);  box-shadow: var(--gold-glow), 0 10px 40px rgba(255, 215, 0, 0.3);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px) rotate(-2deg); }
+  75% { transform: translateX(8px) rotate(2deg); }
+}
+
+.theme-card.locked-cant-afford {
+  opacity: 0.7;
+  filter: grayscale(0.3);
+}
+.theme-card.locked-cant-afford:hover {
+  opacity: 1;
+  filter: grayscale(0);
+  border-color: var(--red);
+}
+
+.theme-preview, .sword-preview, .item-preview {
+  /* ✅ تغییر: سایز کوچکتر برای آیتم‌ها */
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  margin-bottom: 8px;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px; /* ✅ فونت کوچکتر */
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+}
+
+.item-name { 
+  font-weight: 800; 
+  font-size: 12px; /* ✅ فونت کوچکتر */
+  margin-bottom: 4px; 
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.item-price { 
+  font-size: 11px; /* ✅ فونت کوچکتر */
+  color: var(--gold);   background: rgba(0, 0, 0, 0.7); 
+  padding: 4px 10px; 
+  border-radius: 8px; 
+  font-weight: 800;
+  margin-bottom: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.status-badge {
+  font-size: 10px; /* ✅ فونت کوچکتر */
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 6px;
+  margin-top: auto;
+  letter-spacing: 0.5px;
+}
+
+.status-active { color: #000; background: var(--green); box-shadow: var(--green-glow); }
+.status-unlocked { color: #fff; background: rgba(255, 255, 255, 0.25); box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); }
+.status-locked-afford { color: var(--gold); border: 2px solid var(--gold); background: rgba(255, 215, 0, 0.1); }
+.status-locked-cant { color: var(--red); border: 2px solid var(--red); background: rgba(255, 71, 87, 0.1); }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: var(--glass-bg);
+  border: 2px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 22px;
+  text-align: center;
+  backdrop-filter: blur(15px);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--glass-highlight);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+}
+
+.stat-icon { font-size: 45px; margin-bottom: 12px; filter: drop-shadow(0 3px 10px rgba(0,0,0,0.5)); }
+.stat-value { font-size: 35px; font-weight: 900; color: var(--gold); margin-bottom: 6px; text-shadow: var(--gold-glow); }.stat-label { font-size: 14px; color: var(--text-secondary); font-weight: 600; }
+
+.mission-card {
+  background: var(--glass-bg);
+  border: 2px solid var(--glass-border);
+  border-radius: 22px;
+  padding: 25px;
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 18px;
+  backdrop-filter: blur(15px);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.mission-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--purple), var(--blue), var(--green));
+}
+
+.mission-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6);
+}
+
+.mission-card.completed {
+  border-color: var(--green);
+  background: rgba(0, 255, 136, 0.1);
+}
+
+.mission-card.completed::before {
+  background: var(--green);
+  box-shadow: var(--green-glow);
+}
+
+.mission-card.challenging {
+  border-color: var(--orange);
+}
+.mission-card.challenging::before {
+  background: linear-gradient(90deg, var(--orange), var(--red));
+  box-shadow: 0 0 15px rgba(255, 165, 2, 0.6);
+}
+
+.mission-title { font-size: 21px; font-weight: 800; margin-bottom: 10px; color: #fff; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8); }
+.mission-desc { font-size: 15px; color: var(--text-secondary); margin-bottom: 15px; line-height: 1.6; }
+.mission-progress {
+  width: 100%;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.mission-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), #00ffaa);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.mission-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+.mission-reward { font-size: 17px; color: var(--gold); font-weight: 800; margin-bottom: 12px; text-shadow: var(--gold-glow); }
+
+.mission-claim-btn {
+  background: var(--green);
+  color: #000;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+  box-shadow: var(--green-glow);
+}
+
+.mission-claim-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 0 35px rgba(0, 255, 136, 0.8);
+}
+
+.mission-claim-btn:disabled { background: #444; cursor: not-allowed; box-shadow: none; transform: none; }
+.notification, .welcome-toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(20px);
+  padding: 18px 40px;
+  border-radius: 35px;
+  font-weight: 800;
+  z-index: 1000;
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  border: 2px solid var(--gold);
+  color: var(--gold);
+  font-size: 17px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8);
+}
+.notification { top: 100px; }
+.notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.notification.success {
+  border-color: var(--green);
+  color: var(--green);
+  box-shadow: var(--green-glow), 0 10px 50px rgba(0, 0, 0, 0.8);
+}
+
+.notification.error {
+  border-color: var(--red);
+  color: var(--red);
+  box-shadow: 0 0 25px rgba(255, 71, 87, 0.7), 0 10px 50px rgba(0, 0, 0, 0.8);
+}
+
+.welcome-toast {
+  top: 50%;
+  font-size: 26px;
+  box-shadow: var(--gold-glow), 0 20px 80px rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.95);
+}
+
+.welcome-toast.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.welcome-toast .subtitle {
+  display: block;
+  font-size: 16px;
+  color: #fff;  margin-top: 10px;
+  font-weight: 500;
+}
+
+.floating-text {
+  position: absolute;
+  font-weight: 900;
+  font-size: 40px;
+  pointer-events: none;
+  animation: floatUpPro 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  text-shadow: 0 4px 25px rgba(0, 0, 0, 0.8);
+  z-index: 100;
+  filter: drop-shadow(0 0 15px currentColor);
+}
+
+@keyframes floatUpPro {
+  0% { transform: translateY(0) scale(0.3) rotate(-10deg); opacity: 0; filter: blur(5px); }
+  20% { transform: translateY(-30px) scale(1.4) rotate(5deg); opacity: 1; filter: blur(0); }
+  70% { transform: translateY(-100px) scale(1) rotate(0); opacity: 0.9; }
+  100% { transform: translateY(-180px) scale(0.8) rotate(10deg); opacity: 0; filter: blur(3px); }
+}
+
+.screen-flash {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 50;
+  animation: flashEffect 0.3s ease forwards;
+}
+
+@keyframes flashEffect {
+  0% { opacity: 0.8; }
+  100% { opacity: 0; transform: scale(2); }
+}
+
+.power-activation {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: radial-gradient(ellipse at center, rgba(165, 94, 234, 0.4) 0%, rgba(77, 171, 247, 0.2) 40%, transparent 70%);
+  pointer-events: none;
+  z-index: 40;
+  animation: powerActivate 0.5s ease forwards;
+}
+
+@keyframes powerActivate {
+  0% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 1; }  100% { opacity: 0; transform: scale(2); }
+}
+
+.daily-reward-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(20px);
+  padding: 40px 60px;
+  border-radius: 35px;
+  border: 3px solid var(--gold);
+  z-index: 1001;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--gold-glow), 0 20px 80px rgba(0, 0, 0, 0.8);
+}
+
+.daily-reward-popup.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+}
+
+.daily-reward-popup h3 {
+  font-size: 32px;
+  color: var(--gold);
+  margin-bottom: 15px;
+  text-shadow: var(--gold-glow);
+}
+
+.daily-reward-popup p {
+  font-size: 18px;
+  color: #fff;
+  margin-bottom: 25px;
+}
+
+.daily-reward-amount {
+  font-size: 48px;
+  color: var(--gold);
+  font-weight: 900;
+  text-shadow: var(--gold-glow);
+  margin: 20px 0;
+}
+
+@media (max-width: 600px) {
+  .game-title { font-size: 48px; }  .section-title { font-size: 34px; }
+  .hud-item { font-size: 15px; padding: 10px 18px; }
+  .power-bar-container { width: 280px; }
+  .shop-grid, .sword-grid { grid-template-columns: repeat(2, 1fr); }
+  .theme-card, .sword-card, .item-card { min-height: 135px; padding: 10px 8px; }
+  .theme-preview, .sword-preview, .item-preview { width: 45px; height: 45px; font-size: 24px; }
+  .item-name { font-size: 12px; }
+  .btn { padding: 16px 40px; font-size: 17px; }
+  .daily-reward-popup { padding: 30px 40px; width: 90%; }
+  .daily-reward-amount { font-size: 36px; }
+}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<canvas id="game-canvas"></canvas>
+
+<div id="ui-layer">
+  <div class="hud">
+    <div class="hud-item"><span class="score-text">🎯 <span id="score">0</span></span></div>
+    <div class="hud-item"><span class="coins-text">💎 <span id="coins">0</span></span></div>
+    <div class="hud-item"><span class="lives-text">❤️ <span id="lives">❤️❤️❤️</span></span></div>
+    <div class="hud-item"><span class="combo-text">🔥 <span id="combo">0</span>x</span></div>
+  </div>
+  <div class="power-bar-container">
+    <div class="power-bar-fill" id="power-bar"></div>
+  </div>
+  <div class="power-bar-text">✨ نوار قدرت ویژه</div>
+</div>
+
+<div id="menu-overlay" class="overlay">
+  <h1 class="game-title">🔥 فرویتا پرو 🔥</h1>
+  <div class="creator-name">سازنده: پویا زاینده</div>
+  <p class="game-subtitle">میوه‌ها رو ببر، بمب‌ها رو دور بزن و رکورد بزن!</p>
+  <div id="final-score"></div>
+  <div class="menu-buttons">
+    <button class="btn btn-start" onclick="Game.start()">🚀 شروع بازی</button>
+    <button class="btn btn-shop" onclick="UI.openShop()">🛒 فروشگاه</button>
+    <button class="btn btn-stats" onclick="UI.openStats()">📊 آمار</button>
+    <button class="btn btn-mission" onclick="UI.openMission()">🎯 مأموریت‌ها</button>
+  </div>
+</div>
+
+<div id="shop-overlay" class="overlay hidden">
+  <div class="shop-header">
+    <h2 class="section-title">🛒 فروشگاه</h2>
+    <div class="shop-coins-display"><span>💎</span><span id="shop-coins">0</span></div>
+  </div>
+  
+  <h3 style="color:#fff; margin:18px 0 12px; width:100%; max-width:900px; text-align:right; font-size:20px; font-weight:700;">❤️ جان اضافی</h3>  <div class="shop-grid" id="life-grid" style="grid-template-columns: 1fr; max-height: none; min-height: auto;"></div>
+  
+  <h3 style="color:#fff; margin:18px 0 12px; width:100%; max-width:900px; text-align:right; font-size:20px; font-weight:700;">🎨 تم‌های محیط بازی</h3>
+  <div class="shop-grid" id="theme-grid"></div>
+  
+  <h3 style="color:#fff; margin:18px 0 12px; width:100%; max-width:900px; text-align:right; font-size:20px; font-weight:700;">⚔️ شمشیرهای افسانه‌ای</h3>
+  <div class="sword-grid" id="sword-grid"></div>
+  
+  <button class="btn btn-back" onclick="UI.closeShop()">↩ بازگشت</button>
+</div>
+
+<div id="stats-overlay" class="overlay hidden">
+  <div class="stats-header"><h2 class="section-title">📊 آمار قهرمان</h2></div>
+  <div class="stats-grid" id="stats-grid"></div>
+  <button class="btn btn-back" onclick="UI.closeStats()">↩ بازگشت</button>
+</div>
+
+<div id="mission-overlay" class="overlay hidden">
+  <div class="mission-header">
+    <h2 class="section-title">🎯 مأموریت‌های روزانه</h2>
+    <div class="shop-coins-display"><span>💎</span><span id="mission-coins">0</span></div>
+  </div>
+  <div id="mission-container"></div>
+  <button class="btn btn-back" onclick="UI.closeMission()">↩ بازگشت</button>
+</div>
+
+<div id="daily-reward" class="daily-reward-popup">
+  <h3>🎁 پاداش روزانه</h3>
+  <p>ورود امروزت رو دریافت کن!</p>
+  <div class="daily-reward-amount" id="daily-reward-amount">+100 💎</div>
+  <button class="btn btn-start" onclick="UI.claimDailyReward()">دریافت پاداش</button>
+</div>
+
+<div id="welcome-toast" class="welcome-toast">
+  <div>👋 خوش اومدی قهرمان!</div>
+  <span class="subtitle">آماده‌ای برای رکورد زدن؟ 🎮</span>
+</div>
+
+<script>
+const CONFIG = {
+  graphics: { particleCount: 18, trailLength: 8, maxParticles: 120, enableGlow: true },
+  gameplay: { baseSpawnRate: 800, minSpawnRate: 350, spawnRateDecrease: 12, baseSpeed: -17, speedVariation: 6, gravity: 0.38, bombChance: 0.1, goldenChance: 0.04, comboWindow: 500, maxLives: 5 },
+  power: { maxPower: 100, powerPerFruit: 5, powerPerGolden: 15, powerDuration: 8000, activationThreshold: 100 },
+  audio: { enabled: true, volume: 0.35 },
+  storage: { prefix: 'FruitaPro_' },
+  shop: { lifePrice: 100 },
+  dailyReward: { baseAmount: 100, streakBonus: 50 }
+};
+
+const ASSETS = {  fruits: [
+    { emoji: "🍒", color: "#ff4757" }, { emoji: "🍇", color: "#a55eea" }, { emoji: "🍌", color: "#ffa502" },
+    { emoji: "🍍", color: "#ff6348" }, { emoji: "🍑", color: "#ff7f50" }, { emoji: "🍏", color: "#2ed573" },
+    { emoji: "🍊", color: "#ffa502" }, { emoji: "🍎", color: "#ff4757" }, { emoji: "🥝", color: "#7bed9f" },
+    { emoji: "🍓", color: "#ff4757" }, { emoji: "🍋", color: "#ffd700" }, { emoji: "🥭", color: "#ffa502" }
+  ],
+  themes: [
+    { id: 0, name: "🌌 کهکشان", gradient: "linear-gradient(135deg, #0f0c29, #302b63, #24243e)", price: 0 },
+    { id: 1, name: "🌲 جنگل", gradient: "linear-gradient(135deg, #134E5E, #71B280)", price: 150 },
+    { id: 2, name: "🌊 اقیانوس", gradient: "linear-gradient(to top, #000428, #004e92)", price: 150 },
+    { id: 3, name: "🌅 غروب (صورتی)", gradient: "linear-gradient(120deg, #f093fb, #f5576c)", price: 200 },
+    { id: 4, name: "👑 طلایی", gradient: "linear-gradient(to bottom, #000, #434343, #D4AF37)", price: 300 },
+    { id: 5, name: "💜 نئون", gradient: "linear-gradient(to right, #DA22FF, #9733EE)", price: 300 }
+  ],
+  swords: [
+    { id: 0, name: "⚔️ کلاسیک", emoji: "⚔️", color: "#00ffff", price: 0, trail: "#00ffff" },
+    { id: 1, name: "🔥 آتشین", emoji: "🔥", color: "#ff4500", price: 200, trail: "#ff6b35" },
+    { id: 2, name: "❄️ یخی", emoji: "❄️", color: "#00d2ff", price: 200, trail: "#87CEEB" },
+    { id: 3, name: "⚡ رعد", emoji: "⚡", color: "#ffd700", price: 350, trail: "#ffff00" },
+    { id: 4, name: "👑 طلایی", emoji: "👑", color: "#ffd700", price: 600, trail: "#ffd700" },
+    { id: 5, name: "💜 کیهانی", emoji: "💜", color: "#a55eea", price: 800, trail: "#da22ff" }
+  ],
+  missions: [
+    { id: 1, title: "🍎 شکارچی میوه", desc: "۵۰ میوه ببر", type: 'sliceFruit', target: 50, difficulty: 'easy', reward: 100 },
+    { id: 2, title: "🔥 استاد کمبو", desc: "کمبو x15 بگیر", type: 'reachCombo', target: 15, difficulty: 'medium', reward: 200 },
+    { id: 3, title: "🌟 شکارچی طلایی", desc: "۵ میوه طلایی", type: 'sliceGolden', target: 5, difficulty: 'medium', reward: 300 },
+    { id: 4, title: "🎯 امتیاز بالا", desc: "امتیاز 1000", type: 'reachScore', target: 1000, difficulty: 'hard', reward: 400 },
+    { id: 5, title: "⚡ قدرت مطلق", desc: "۳ بار فعال‌سازی قدرت", type: 'activatePower', target: 3, difficulty: 'medium', reward: 350 }
+  ]
+};
+
+const Storage = {
+  prefix: CONFIG.storage.prefix,
+  get(key, def = null) { try { return JSON.parse(localStorage.getItem(this.prefix + key)) || def; } catch { return def; } },
+  set(key, val) { try { localStorage.setItem(this.prefix + key, JSON.stringify(val)); return true; } catch { return false; } },
+  get player() {
+    return {
+      coins: this.get('coins', 0), 
+      highScore: this.get('highScore', 0),
+      currentTheme: this.get('currentTheme', 0), 
+      unlockedThemes: this.get('unlockedThemes', [0]),
+      currentSword: this.get('currentSword', 0), 
+      unlockedSwords: this.get('unlockedSwords', [0]),
+      stats: this.get('stats', { gamesPlayed: 0, totalSlices: 0, totalCoins: 0, bestCombo: 0, totalPlayTime: 0, bombsHit: 0, fruitsMissed: 0, goldenSliced: 0, powerActivated: 0 }),
+      missions: this.get('missions', {}), 
+      lastMissionDate: this.get('lastMissionDate', null),
+      lastDailyReward: this.get('lastDailyReward', null),
+      dailyStreak: this.get('dailyStreak', 0)
+    };
+  },  updateCoins(amount) { const p = this.player; p.coins += amount; this.set('coins', p.coins); return p.coins; },
+  updateHighScore(score) { const p = this.player; if (score > p.highScore) { this.set('highScore', score); return true; } return false; },
+  updateStats(updates) { const p = this.player; Object.assign(p.stats, updates); this.set('stats', p.stats); },
+  unlockTheme(id) { const p = this.player; if (!p.unlockedThemes.includes(id)) { p.unlockedThemes.push(id); this.set('unlockedThemes', p.unlockedThemes); return true; } return false; },
+  unlockSword(id) { const p = this.player; if (!p.unlockedSwords.includes(id)) { p.unlockedSwords.push(id); this.set('unlockedSwords', p.unlockedSwords); return true; } return false; },
+  claimMissionReward(id) { const p = this.player; if (p.missions[id]?.completed && !p.missions[id].claimed) { p.missions[id].claimed = true; this.set('missions', p.missions); return true; } return false; },
+  canClaimDailyReward() {
+    const today = new Date().toDateString();
+    const lastClaim = this.get('lastDailyReward', null);
+    return lastClaim !== today;
+  },
+  claimDailyReward() {
+    const today = new Date().toDateString();
+    const lastClaim = this.get('lastDailyReward', null);
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    let streak = this.get('dailyStreak', 0);
+    if (lastClaim === yesterday) streak++;
+    else if (lastClaim !== today) streak = 1;
+    const reward = CONFIG.dailyReward.baseAmount + (streak - 1) * CONFIG.dailyReward.streakBonus;
+    this.set('lastDailyReward', today);
+    this.set('dailyStreak', streak);
+    this.updateCoins(reward);
+    return { reward, streak };
+  }
+};
+
+const AudioSystem = {
+  ctx: null, enabled: CONFIG.audio.enabled, volume: CONFIG.audio.volume,
+  async init() { if (!this.enabled) return; try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); if (this.ctx.state === 'suspended') await this.ctx.resume(); } catch { this.enabled = false; } },
+  play(type) {
+    if (!this.enabled || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.connect(gain); gain.connect(this.ctx.destination);
+    gain.gain.value = this.volume;
+    const presets = {
+      slice: { freq: [800, 200], dur: 0.12, type: 'sine' },
+      bomb: { freq: [100, 50], dur: 0.35, type: 'square' },
+      combo: { freq: [600, 800, 1000], dur: 0.28, type: 'triangle' },
+      golden: { freq: [1200, 1600], dur: 0.22, type: 'sine' },
+      power: { freq: [400, 1200], dur: 0.55, type: 'sawtooth' },
+      coin: { freq: [1200, 1600], dur: 0.18, type: 'sine' },
+      mission: { freq: [500, 700, 900], dur: 0.45, type: 'triangle' },
+      error: { freq: [200, 100], dur: 0.28, type: 'square' },
+      welcome: { freq: [400, 600, 800], dur: 0.55, type: 'sine' },
+      buy: { freq: [300, 500, 700], dur: 0.35, type: 'sine' },
+      daily: { freq: [600, 800, 1000, 1200], dur: 0.65, type: 'sine' }
+    };
+    const p = presets[type]; if (!p) return;    osc.type = p.type;
+    if (Array.isArray(p.freq)) p.freq.forEach((f, i) => osc.frequency.setValueAtTime(f, now + i * 0.09));
+    else osc.frequency.setValueAtTime(p.freq, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + p.dur);
+    osc.start(now); osc.stop(now + p.dur);
+  },
+  userInteracted() { if (this.ctx?.state === 'suspended') this.ctx.resume(); }
+};
+
+class ParticleSystem {
+  constructor(canvas, ctx) { this.canvas = canvas; this.ctx = ctx; this.particles = []; this.max = CONFIG.graphics.maxParticles; }
+  emit(x, y, opts = {}) {
+    const { color = '#fff', count = CONFIG.graphics.particleCount, size = {min:2, max:6}, speed = {min:3, max:10}, life = {min:0.6, max:1.2}, type='circle', gravity=0.35, decay={min:0.02, max:0.06}, glow=false } = opts;
+    for (let i = 0; i < count && this.particles.length < this.max; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const vel = Math.random() * (speed.max - speed.min) + speed.min;
+      this.particles.push({
+        x, y, vx: Math.cos(angle)*vel, vy: Math.sin(angle)*vel - 2,
+        size: Math.random()*(size.max-size.min)+size.min, life: Math.random()*(life.max-life.min)+life.min, maxLife: life.max,
+        color, type, gravity, decay: Math.random()*(decay.max-decay.min)+decay.min, glow, rotation: Math.random()*Math.PI*2, rotSpeed: (Math.random()-0.5)*0.25
+      });
+    }
+  }
+  emitTrail(x, y, color) {
+    for(let i=0; i<3; i++) this.particles.push({
+      x: x+(Math.random()-0.5)*18, y: y+(Math.random()-0.5)*18, vx: (Math.random()-0.5)*2.5, vy: Math.random()*3+1,
+      size: Math.random()*4+2, life: 0.35, maxLife: 0.35, color, type:'circle', gravity:0.12, decay:0.12, glow:true
+    });
+  }
+  emitExplosion(x, y, color) {
+    this.emit(x, y, { color, count: 25, size:{min:3, max:7}, speed:{min:3, max:12}, gravity:0.4 });
+    for(let i=0; i<8; i++) this.particles.push({
+      x, y, vx:(Math.random()-0.5)*12, vy:(Math.random()-0.5)*12, size:Math.random()*3+2, life:0.5, maxLife:0.5,
+      color:'rgba(255,255,255,0.6)', type:'spark', gravity:0.25, decay:0.1, glow:true
+    });
+  }
+  emitPower(x, y) {
+    for(let i=0; i<40; i++) {
+      const angle = (i/40)*Math.PI*2; const speed = 7+Math.random()*4;
+      this.particles.push({ x, y, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed, size:Math.random()*5+3, life:1.4, maxLife:1.4, color:`hsl(${280+Math.random()*40}, 100%, 70%)`, type:'spark', gravity:0, decay:0.05, glow:true });
+    }
+  }
+  update() {
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const p = this.particles[i];
+      p.x += p.vx; p.y += p.vy; p.vy += p.gravity; p.vx *= 0.97; p.life -= p.decay; p.rotation += p.rotSpeed;
+      if (p.life <= 0) this.particles.splice(i, 1);
+    }
+  }
+  draw() {    for (const p of this.particles) {
+      const alpha = Math.max(0, p.life / p.maxLife);
+      this.ctx.save();
+      this.ctx.globalAlpha = alpha * 0.85;
+      if (p.glow && CONFIG.graphics.enableGlow) { this.ctx.shadowColor = p.color; this.ctx.shadowBlur = 12; }
+      this.ctx.translate(p.x, p.y); this.ctx.rotate(p.rotation);
+      if (p.type === 'spark') { this.ctx.fillStyle = p.color; this.ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size); }
+      else { this.ctx.fillStyle = p.color; this.ctx.beginPath(); this.ctx.arc(0, 0, p.size, 0, Math.PI*2); this.ctx.fill(); }
+      this.ctx.restore();
+    }
+  }
+  clear() { this.particles = []; }
+}
+
+class FloatingText {
+  constructor(x, y, text, opts = {}) {
+    this.x = x; this.y = y; this.text = text; this.color = opts.color || '#fff'; this.size = opts.size || 35;
+    this.life = 1; this.vy = -4 - Math.random()*2; this.vx = (Math.random()-0.5)*2.5; this.rotation = (Math.random()-0.5)*0.35;
+    this.scale = 0.4; this.targetScale = 1.2 + Math.random()*0.3; this.glow = opts.glow || false;
+  }
+  update() { this.x += this.vx; this.y += this.vy; this.vy += 0.12; this.life -= 0.018; this.scale += (this.targetScale - this.scale)*0.12; }
+  draw(ctx) {
+    if (this.life <= 0) return;
+    ctx.save(); ctx.globalAlpha = Math.max(0, this.life); ctx.translate(this.x, this.y); ctx.rotate(this.rotation); ctx.scale(this.scale, this.scale);
+    if (this.glow && CONFIG.graphics.enableGlow) { ctx.shadowColor = this.color; ctx.shadowBlur = 18; }
+    ctx.font = `900 ${this.size}px Vazirmatn`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = this.color; ctx.fillText(this.text, 0, 0);
+    ctx.restore();
+  }
+  isDead() { return this.life <= 0; }
+}
+
+class GameObject {
+  constructor(type = 'fruit') { this.reset(type); }
+  reset(type) {
+    this.type = type;
+    this.x = Math.random() * (Game.width - 120) + 60;
+    this.y = Game.height + 70;
+    this.radius = 38;
+    this.baseSpeedY = CONFIG.gameplay.baseSpeed - Math.random() * CONFIG.gameplay.speedVariation;
+    this.speedY = this.baseSpeedY;
+    this.gravity = CONFIG.gameplay.gravity;
+    this.rotation = Math.random() * Math.PI * 2;
+    this.rotSpeed = (Math.random() - 0.5) * 0.25;
+    this.sliced = false; this.hit = false;
+    if (type === 'bomb') { this.emoji = '💣'; this.color = '#ff4757'; this.points = 0; this.radius = 42; }
+    else {
+      const fruit = ASSETS.fruits[Math.floor(Math.random() * ASSETS.fruits.length)];
+      this.emoji = fruit.emoji; this.color = fruit.color; this.points = 1;
+      this.isGolden = Math.random() < CONFIG.gameplay.goldenChance;
+      if (this.isGolden) { this.emoji = '🌟'; this.color = '#ffd700'; this.points = 5; this.radius = 42; }    }
+    this.pulsePhase = Math.random() * Math.PI * 2;
+  }
+  update(powerMode = false) {
+    this.speedY += this.gravity;
+    this.y += powerMode ? this.speedY * 1.15 : this.speedY;
+    this.rotation += this.rotSpeed;
+    if (this.isGolden) { this.pulsePhase += 0.12; }
+    return this.y > Game.height + 90;
+  }
+  draw(ctx, powerMode = false) {
+    ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.rotation);
+    ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 6;
+    if (this.isGolden && CONFIG.graphics.enableGlow) {
+      const glow = 0.5 + Math.sin(this.pulsePhase)*0.35;
+      ctx.shadowColor = `rgba(255,215,0,${0.7+glow*0.5})`; ctx.shadowBlur = 25 + glow*20;
+    }
+    if (powerMode) ctx.globalAlpha = 0.9 + Math.sin(Date.now()/100)*0.1;
+    ctx.font = this.isGolden ? 'bold 65px serif' : 'bold 52px serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(this.emoji, 0, 0);
+    if (this.isGolden) {
+      ctx.strokeStyle = `rgba(255,215,0,${0.6+Math.sin(this.pulsePhase)*0.35})`; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(0, 0, this.radius+4, 0, Math.PI*2); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  checkSlice(mx, my) { if (this.sliced || this.hit) return false; return Math.hypot(mx - this.x, my - this.y) < this.radius; }
+}
+
+const Game = {
+  canvas: null, ctx: null, bgCanvas: null, bgCtx: null,
+  running: false, paused: false, powerMode: false,
+  objects: [], particles: null, floatingTexts: [], mouseTrail: [],
+  score: 0, lives: 3, combo: 0, power: 0, lastSliceTime: 0,
+  spawnTimer: null, gameLoopId: null, powerTimer: null, startTime: 0,
+  input: { x: 0, y: 0, active: false }, width: 0, height: 0,
+  dailyRewardShown: false, // ✅ فلگ برای جلوگیری از نمایش تکراری
+
+  async init() {
+    this.canvas = document.getElementById('game-canvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.bgCanvas = document.getElementById('bg-canvas');
+    this.bgCtx = this.bgCanvas.getContext('2d');
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+    this.particles = new ParticleSystem(this.canvas, this.ctx);
+    this.setupInput();
+    const savedTheme = Storage.player.currentTheme;
+    this.applyTheme(savedTheme);
+    this.showWelcome();    
+    // ✅ بررسی پاداش روزانه فقط یکبار
+    if (!this.dailyRewardShown && Storage.canClaimDailyReward()) {
+      setTimeout(() => {
+        UI.showDailyReward();
+        this.dailyRewardShown = true; // ✅ قفل کردن برای جلوگیری از تکرار
+      }, 1500);
+    }
+    
+    console.log('🎮 Fruita Ultimate Pro - Ready!');
+  },
+
+  showWelcome() {
+    const toast = document.getElementById('welcome-toast');
+    toast.classList.add('show');
+    AudioSystem.play('welcome');
+    setTimeout(() => toast.classList.remove('show'), 2800);
+  },
+
+  resize() {
+    this.width = window.innerWidth; this.height = window.innerHeight;
+    this.canvas.width = this.width; this.canvas.height = this.height;
+    this.bgCanvas.width = this.width; this.bgCanvas.height = this.height;
+    this.drawBackground();
+  },
+
+  drawBackground() {
+    const player = Storage.player;
+    const theme = ASSETS.themes.find(t => t.id === player.currentTheme) || ASSETS.themes[0];
+    this.bgCtx.clearRect(0, 0, this.width, this.height);
+    this.bgCtx.fillStyle = theme.gradient;
+    this.bgCtx.fillRect(0, 0, this.width, this.height);
+  },
+
+  animateBackground() { 
+    if (!this.running) return; 
+    this.drawBackground(); 
+    requestAnimationFrame(() => this.animateBackground()); 
+  },
+  
+  applyTheme(id) { 
+    const t = ASSETS.themes.find(x => x.id === id); 
+    if(t) { 
+      Storage.set('currentTheme', id);
+      document.body.style.background = t.gradient;
+      if(this.bgCtx) {
+        this.bgCtx.clearRect(0, 0, this.width, this.height);
+        this.bgCtx.fillStyle = t.gradient;
+        this.bgCtx.fillRect(0, 0, this.width, this.height);
+      }      console.log('✅ Theme Applied:', t.name);
+    } 
+  },
+
+  setupInput() {
+    const handleMove = (x, y) => {
+      this.input.x = x; this.input.y = y; this.input.active = true;
+      if (this.running) {
+        this.mouseTrail.push({ x, y, time: Date.now() });
+        if (this.mouseTrail.length > CONFIG.graphics.trailLength) this.mouseTrail.shift();
+        const sword = ASSETS.swords.find(s => s.id === Storage.player.currentSword);
+        if (this.mouseTrail.length >= 2) this.particles.emitTrail(x, y, sword?.trail || '#00ffff');
+      }
+    };
+    this.canvas.addEventListener('mousemove', e => { handleMove(e.clientX, e.clientY); if(AudioSystem.ctx?.state!=='running') AudioSystem.userInteracted(); });
+    this.canvas.addEventListener('mousedown', () => AudioSystem.userInteracted());
+    this.canvas.addEventListener('touchmove', e => { e.preventDefault(); handleMove(e.touches[0].clientX, e.touches[0].clientY); AudioSystem.userInteracted(); }, { passive: false });
+    this.canvas.addEventListener('touchstart', e => AudioSystem.userInteracted(), { passive: true });
+  },
+
+  start() {
+    AudioSystem.init(); AudioSystem.userInteracted();
+    this.running = true; this.paused = false; this.powerMode = false;
+    this.score = 0; this.lives = 3; this.combo = 0; this.power = 0;
+    this.objects = []; this.floatingTexts = []; this.mouseTrail = []; this.particles.clear();
+    UI.updateHUD(); UI.updatePowerBar(0);
+    document.getElementById('menu-overlay').classList.add('hidden');
+    document.getElementById('final-score').style.display = 'none';
+    Storage.updateStats({ gamesPlayed: Storage.player.stats.gamesPlayed + 1 });
+    this.startTime = Date.now();
+    this.spawn();
+    this.animateBackground();
+    this.loop();
+    AudioSystem.play('slice', { volume: 0.2 });
+  },
+
+  spawn() {
+    if (!this.running) return;
+    const rate = Math.max(CONFIG.gameplay.minSpawnRate, CONFIG.gameplay.baseSpawnRate - this.score * CONFIG.gameplay.spawnRateDecrease);
+    const type = Math.random() < CONFIG.gameplay.bombChance ? 'bomb' : 'fruit';
+    this.objects.push(new GameObject(type));
+    this.spawnTimer = setTimeout(() => this.spawn(), rate);
+  },
+
+  loop() {
+    if (!this.running) return;
+    this.ctx.clearRect(0, 0, this.width, this.height);
+    if (this.powerMode) { this.ctx.save(); this.ctx.globalAlpha = 0.06; this.ctx.fillStyle = '#a55eea'; this.ctx.fillRect(0, 0, this.width, this.height); this.ctx.restore(); }
+    for (let i = this.objects.length - 1; i >= 0; i--) {
+      const obj = this.objects[i];      const out = obj.update(this.powerMode);
+      obj.draw(this.ctx, this.powerMode);
+      if (out) {
+        if (obj.type === 'fruit' && !obj.sliced) { this.loseLife(); }
+        this.objects.splice(i, 1);
+        if (obj.type === 'fruit') this.resetCombo();
+      }
+    }
+    if (this.input.active && this.mouseTrail.length >= 2) this.checkSlice(this.input.x, this.input.y);
+    this.particles.update(); this.particles.draw();
+    for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
+      this.floatingTexts[i].update(); this.floatingTexts[i].draw(this.ctx);
+      if (this.floatingTexts[i].isDead()) this.floatingTexts.splice(i, 1);
+    }
+    this.drawSwordTrail();
+    this.gameLoopId = requestAnimationFrame(() => this.loop());
+  },
+
+  drawSwordTrail() {
+    if (this.mouseTrail.length < 2) return;
+    const sword = ASSETS.swords.find(s => s.id === Storage.player.currentSword);
+    const color = sword?.trail || '#00ffff';
+    this.ctx.save();
+    this.ctx.beginPath(); this.ctx.moveTo(this.mouseTrail[0].x, this.mouseTrail[0].y);
+    for (let i = 1; i < this.mouseTrail.length; i++) this.ctx.lineTo(this.mouseTrail[i].x, this.mouseTrail[i].y);
+    this.ctx.strokeStyle = color; this.ctx.lineWidth = this.powerMode ? 6 : 4; this.ctx.lineCap = 'round'; this.ctx.lineJoin = 'round';
+    if (CONFIG.graphics.enableGlow) { this.ctx.shadowColor = color; this.ctx.shadowBlur = this.powerMode ? 30 : 15; }
+    this.ctx.stroke();
+    const last = this.mouseTrail[this.mouseTrail.length - 1];
+    const prev = this.mouseTrail[this.mouseTrail.length - 2];
+    const angle = Math.atan2(last.y - prev.y, last.x - prev.x);
+    this.ctx.translate(last.x, last.y); this.ctx.rotate(angle + Math.PI / 4);
+    this.ctx.font = this.powerMode ? '55px serif' : '45px serif'; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle';
+    if (this.powerMode) { this.ctx.shadowColor = '#da22ff'; this.ctx.shadowBlur = 35; this.ctx.fillText('💜', 0, 0); }
+    else this.ctx.fillText(sword?.emoji || '⚔️', 0, 0);
+    this.ctx.restore();
+  },
+
+  checkSlice(mx, my) {
+    for (let i = this.objects.length - 1; i >= 0; i--) {
+      const obj = this.objects[i];
+      if (obj.checkSlice(mx, my)) {
+        obj.sliced = true;
+        if (obj.type === 'bomb') this.hitBomb(obj);
+        else this.sliceFruit(obj);
+        this.objects.splice(i, 1);
+        return true;
+      }
+    }
+    return false;  },
+
+  sliceFruit(obj) {
+    Storage.updateStats({ totalSlices: Storage.player.stats.totalSlices + 1 });
+    if (obj.isGolden) Storage.updateStats({ goldenSliced: Storage.player.stats.goldenSliced + 1 });
+    const now = Date.now();
+    if (now - this.lastSliceTime < CONFIG.gameplay.comboWindow) this.combo++; else this.combo = 1;
+    this.lastSliceTime = now;
+    if (this.combo > Storage.player.stats.bestCombo) Storage.updateStats({ bestCombo: this.combo });
+    let points = obj.points * (this.combo > 1 ? this.combo : 1);
+    if (this.powerMode) points = Math.floor(points * 2.5);
+    this.score += points;
+    let coins = points;
+    if (obj.isGolden) coins += 12;
+    if (this.powerMode) coins = Math.floor(coins * 1.5);
+    Storage.updateCoins(coins);
+    this.addPower(obj.isGolden ? CONFIG.power.powerPerGolden : CONFIG.power.powerPerFruit);
+    UI.updateHUD();
+    AudioSystem.play(obj.isGolden ? 'golden' : (this.combo > 1 ? 'combo' : 'slice'));
+    const color = obj.isGolden ? '#ffd700' : obj.color;
+    this.particles.emitExplosion(obj.x, obj.y, color);
+    let text = `+${points}`, textColor = '#00ff88';
+    if (this.powerMode) { text = `💜 ${points}`; textColor = '#da22ff'; }
+    else if (obj.isGolden) { text = `🌟 ${points}`; textColor = '#ffd700'; }
+    else if (this.combo > 1) { text = `🔥 x${this.combo}`; textColor = '#ffa502'; }
+    this.floatingTexts.push(new FloatingText(obj.x, obj.y - 55, text, { color: textColor, glow: obj.isGolden || this.powerMode }));
+    Mission.checkProgress('sliceFruit', 1);
+    Mission.checkProgress('sliceGolden', obj.isGolden ? 1 : 0);
+    if (this.combo >= 15) Mission.checkProgress('reachCombo', 1);
+    if (this.combo > 1 && this.combo % 5 === 0) UI.flashHUD('combo');
+  },
+
+  hitBomb(obj) {
+    Storage.updateStats({ bombsHit: Storage.player.stats.bombsHit + 1 });
+    this.particles.emitExplosion(obj.x, obj.y, '#ff4757');
+    UI.screenShake(25);
+    this.resetCombo();
+    this.loseLife();
+    AudioSystem.play('bomb');
+    this.floatingTexts.push(new FloatingText(obj.x, obj.y - 55, '💥 بمب!', { color: '#ff4757', size: 45, glow: true }));
+    AudioSystem.play('error');
+  },
+
+  loseLife() {
+    this.lives--; UI.updateLives(this.lives);
+    if (this.lives <= 0) this.gameOver();
+    else { UI.flashHUD('lives'); AudioSystem.play('error'); }
+  },
+
+  resetCombo() { this.combo = 0; UI.updateCombo(0); },
+  addPower(amount) {
+    if (this.powerMode) return;
+    this.power = Math.min(CONFIG.power.maxPower, this.power + amount);
+    UI.updatePowerBar(this.power);
+    if (this.power >= CONFIG.power.activationThreshold) this.activatePowerMode();
+  },
+  activatePowerMode() {
+    this.powerMode = true; this.power = 0; UI.updatePowerBar(0);
+    UI.showPowerActivation();
+    this.particles.emitPower(this.width / 2, this.height / 2);
+    AudioSystem.play('power');
+    UI.notify('⚡ حالت قدرت ویژه فعال شد! ⚡', 'power');
+    Storage.updateStats({ powerActivated: Storage.player.stats.powerActivated + 1 });
+    Mission.checkProgress('activatePower', 1);
+    clearTimeout(this.powerTimer);
+    this.powerTimer = setTimeout(() => { this.powerMode = false; UI.notify('✅ بازگشت به حالت عادی', 'success'); }, CONFIG.power.powerDuration);
+  },
+
+  gameOver() {
+    this.running = false;
+    clearTimeout(this.spawnTimer); clearTimeout(this.powerTimer);
+    if (this.gameLoopId) cancelAnimationFrame(this.gameLoopId);
+    const playTime = Math.floor((Date.now() - this.startTime) / 1000);
+    Storage.updateStats({ totalCoins: Storage.player.stats.totalCoins + Storage.player.coins, totalPlayTime: Storage.player.stats.totalPlayTime + playTime });
+    if (Storage.updateHighScore(this.score)) UI.notify('🏆 رکورد جدید! 🏆', 'success');
+    document.getElementById('menu-overlay').classList.remove('hidden');
+    const finalScore = document.getElementById('final-score');
+    finalScore.innerHTML = `<div>🎯 امتیاز: <strong style="color:var(--gold)">${this.score}</strong></div><div>💎 سکه: <strong style="color:var(--gold)">+${Storage.player.coins}</strong></div><div>🔥 کمبو: <strong>x${this.combo}</strong></div>`;
+    finalScore.style.display = 'block';
+    document.querySelector('.btn-start').textContent = '🔄 بازی مجدد';
+    AudioSystem.play('mission');
+  }
+};
+
+const UI = {
+  updateHUD() {
+    document.getElementById('score').textContent = Game.score;
+    document.getElementById('coins').textContent = Storage.player.coins;
+    this.updateCombo(Game.combo);
+    this.updateLives(Game.lives);
+  },
+  updateCombo(c) { document.getElementById('combo').textContent = c; },
+  updateLives(l) { document.getElementById('lives').textContent = '❤️'.repeat(Math.max(0, l)); },
+  updatePowerBar(v) {
+    const bar = document.getElementById('power-bar');
+    const p = Math.min(100, (v / CONFIG.power.maxPower) * 100);
+    bar.style.width = `${p}%`;
+    bar.classList.toggle('power-ready', p >= 100 && !Game.powerMode);
+  },  flashHUD(type) {
+    document.querySelectorAll('.hud-item').forEach(item => {
+      if (item.querySelector(`.${type}-text`)) {
+        item.classList.add('pulse');
+        setTimeout(() => item.classList.remove('pulse'), 500);
+      }
+    });
+  },
+  screenShake(intensity = 20) {
+    const c = document.getElementById('game-canvas');
+    let f = 0;
+    function shake() {
+      if (f >= 10) { c.style.transform = ''; return; }
+      c.style.transform = `translate(${(Math.random()-0.5)*intensity}px, ${(Math.random()-0.5)*intensity}px)`;
+      f++; requestAnimationFrame(shake);
+    }
+    shake();
+  },
+  showPowerActivation() {
+    const d = document.createElement('div');
+    d.className = 'power-activation';
+    document.body.appendChild(d);
+    setTimeout(() => d.remove(), 500);
+  },
+  notify(msg, type = 'info') {
+    let n = document.querySelector('.notification');
+    if (!n) { n = document.createElement('div'); n.className = 'notification'; document.body.appendChild(n); }
+    n.className = `notification ${type}`; n.innerHTML = `<span>${msg}</span>`;
+    n.classList.add('show');
+    setTimeout(() => n.classList.remove('show'), 3500);
+  },
+  
+  showDailyReward() {
+    const popup = document.getElementById('daily-reward');
+    const p = Storage.player;
+    const reward = CONFIG.dailyReward.baseAmount + (p.dailyStreak) * CONFIG.dailyReward.streakBonus;
+    document.getElementById('daily-reward-amount').textContent = `+${reward} 💎`;
+    popup.classList.add('show');
+    AudioSystem.play('daily');
+  },
+  
+  claimDailyReward() {
+    const result = Storage.claimDailyReward();
+    document.getElementById('daily-reward').classList.remove('show');
+    this.notify(`🎁 ${result.reward} سکه دریافت شد! (${result.streak} روز متوالی)`, 'success');
+    this.updateAllCoinsDisplay();
+    AudioSystem.play('coin');
+    // ✅ ریست کردن فلگ برای سشن جاری تا دوباره نشان داده نشود
+    Game.dailyRewardShown = true; 
+  },  
+  updateAllCoinsDisplay() {
+    const coinElements = ['shop-coins', 'coins', 'mission-coins'];
+    coinElements.forEach(id => {
+      const el = document.getElementById(id);
+      if(el) el.textContent = Storage.player.coins;
+    });
+  },
+  
+  openShop() {
+    document.getElementById('menu-overlay').classList.add('hidden');
+    document.getElementById('shop-overlay').classList.remove('hidden');
+    this.updateAllCoinsDisplay();
+    this.renderShop();
+  },
+  closeShop() {
+    document.getElementById('shop-overlay').classList.add('hidden');
+    document.getElementById('menu-overlay').classList.remove('hidden');
+    const currentThemeId = Storage.get('currentTheme', 0);
+    Game.applyTheme(currentThemeId);
+    this.updateAllCoinsDisplay();
+  },
+  renderShop() { this.renderLives(); this.renderThemes(); this.renderSwords(); },
+  
+  renderLives() {
+    const grid = document.getElementById('life-grid');
+    grid.innerHTML = '';
+    const p = Storage.player;
+    const card = document.createElement('div');
+    card.className = 'item-card';
+    card.innerHTML = `
+      <div class="item-preview" style="font-size: 35px;">❤️</div>
+      <div class="item-name">جان اضافی</div>
+      <div class="item-price">${CONFIG.shop.lifePrice} 💎</div>
+      <div class="status-badge status-locked-afford">💰 خرید</div>
+    `;
+    card.onclick = () => {
+      if (p.coins >= CONFIG.shop.lifePrice) {
+        Storage.updateCoins(-CONFIG.shop.lifePrice);
+        Game.lives = Math.min(CONFIG.gameplay.maxLives, Game.lives + 1);
+        this.updateAllCoinsDisplay();
+        AudioSystem.play('buy');
+        this.notify('❤️ جان اضافه خریداری شد!', 'success');
+        this.renderLives();
+      } else {
+        AudioSystem.play('error');
+        this.notify('💰 سکه کافی نیست!', 'error');
+        card.style.animation = 'shake 0.4s ease-in-out';
+        setTimeout(() => card.style.animation = '', 400);
+      }    };
+    grid.appendChild(card);
+  },
+  
+  renderThemes() {
+    const grid = document.getElementById('theme-grid'); 
+    grid.innerHTML = '';
+    const p = Storage.player;
+    
+    ASSETS.themes.forEach(t => {
+      const unlocked = p.unlockedThemes.includes(t.id);
+      const active = p.currentTheme === t.id;
+      const card = document.createElement('div');
+      
+      let classes = 'theme-card';
+      if (active) classes += ' active';
+      if (!unlocked && p.coins < t.price) classes += ' locked-cant-afford';
+      
+      card.className = classes;
+      
+      let statusHtml = '';
+      if (active) statusHtml = '<div class="status-badge status-active">✅ فعال</div>';
+      else if (unlocked) statusHtml = '<div class="status-badge status-unlocked">🔓 انتخاب</div>';
+      else {
+        const canAfford = p.coins >= t.price;
+        if (canAfford) statusHtml = `<div class="status-badge status-locked-afford">💰 ${t.price}</div>`;
+        else statusHtml = '<div class="status-badge status-locked-cant">🔒 قفل</div>';
+      }
+      
+      card.innerHTML = `
+        <div class="theme-preview" style="background:${t.gradient}"></div>
+        <div class="item-name">${t.name}</div>
+        ${!unlocked ? `<div class="item-price">${t.price} 💎</div>` : ''}
+        ${statusHtml}
+      `;
+      
+      card.addEventListener('mouseenter', e => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--x', `${e.clientX - rect.left}px`);
+        card.style.setProperty('--y', `${e.clientY - rect.top}px`);
+      });
+      
+      card.onclick = () => {
+        if (unlocked) {
+          Storage.set('currentTheme', t.id);
+          Game.applyTheme(t.id);
+          this.notify(`🎨 تم ${t.name} فعال شد!`, 'success');
+          AudioSystem.play('slice');
+          this.renderThemes();
+        } else if (p.coins >= t.price) {          if(confirm(`آیا مطمئن هستید که می‌خواهید "${t.name}" را به قیمت ${t.price} سکه بخرید؟`)) {
+            Storage.updateCoins(-t.price);
+            Storage.unlockTheme(t.id);
+            Storage.set('currentTheme', t.id);
+            Game.applyTheme(t.id);
+            this.updateAllCoinsDisplay();
+            AudioSystem.play('coin');
+            this.notify(`🎨 ${t.name} خریداری و فعال شد!`, 'success');
+            this.renderThemes();
+          }
+        } else {
+          AudioSystem.play('error');
+          this.notify('💰 سکه کافی نیست!', 'error');
+          card.style.animation = 'shake 0.4s ease-in-out';
+          setTimeout(() => card.style.animation = '', 400);
+        }
+      };
+      grid.appendChild(card);
+    });
+  },
+  
+  renderSwords() {
+    const grid = document.getElementById('sword-grid'); 
+    grid.innerHTML = '';
+    const p = Storage.player;
+    
+    ASSETS.swords.forEach(s => {
+      const unlocked = p.unlockedSwords.includes(s.id);
+      const active = p.currentSword === s.id;
+      const card = document.createElement('div');
+      
+      let classes = 'sword-card';
+      if (active) classes += ' active';
+      if (!unlocked && p.coins < s.price) classes += ' locked-cant-afford';
+      
+      card.className = classes;
+      
+      let statusHtml = '';
+      if (active) statusHtml = '<div class="status-badge status-active">✅ فعال</div>';
+      else if (unlocked) statusHtml = '<div class="status-badge status-unlocked">🔓 انتخاب</div>';
+      else {
+        const canAfford = p.coins >= s.price;
+        if (canAfford) statusHtml = `<div class="status-badge status-locked-afford">💰 ${s.price}</div>`;
+        else statusHtml = '<div class="status-badge status-locked-cant">🔒 قفل</div>';
+      }
+      
+      card.innerHTML = `
+        <div class="sword-preview" style="background:${s.color}25">${s.emoji}</div>
+        <div class="item-name">${s.name}</div>
+        ${!unlocked ? `<div class="item-price">${s.price} 💎</div>` : ''}        ${statusHtml}
+      `;
+      
+      card.addEventListener('mouseenter', e => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--x', `${e.clientX - rect.left}px`);
+        card.style.setProperty('--y', `${e.clientY - rect.top}px`);
+      });
+      
+      card.onclick = () => {
+        if (unlocked) {
+          Storage.set('currentSword', s.id);
+          this.notify(`⚔️ ${s.name} انتخاب شد!`, 'success');
+          this.renderSwords();
+        } else if (p.coins >= s.price) {
+          if(confirm(`آیا مطمئن هستید که می‌خواهید "${s.name}" را به قیمت ${s.price} سکه بخرید؟`)) {
+            Storage.updateCoins(-s.price);
+            Storage.unlockSword(s.id);
+            Storage.set('currentSword', s.id);
+            this.updateAllCoinsDisplay();
+            AudioSystem.play('coin');
+            this.notify(`⚔️ ${s.name} خریداری و فعال شد!`, 'success');
+            this.renderSwords();
+          }
+        } else {
+          AudioSystem.play('error');
+          this.notify('💰 سکه کافی نیست!', 'error');
+          card.style.animation = 'shake 0.4s ease-in-out';
+          setTimeout(() => card.style.animation = '', 400);
+        }
+      };
+      grid.appendChild(card);
+    });
+  },
+  
+  openStats() {
+    document.getElementById('menu-overlay').classList.add('hidden');
+    document.getElementById('stats-overlay').classList.remove('hidden');
+    const s = Storage.player.stats;
+    const h = Math.floor(s.totalPlayTime / 3600), m = Math.floor((s.totalPlayTime % 3600) / 60);
+    document.getElementById('stats-grid').innerHTML = `
+      <div class="stat-card"><div class="stat-icon">🎮</div><div class="stat-value">${s.gamesPlayed.toLocaleString('fa-IR')}</div><div class="stat-label">بازی‌های انجام‌شده</div></div>
+      <div class="stat-card"><div class="stat-icon">✂️</div><div class="stat-value">${s.totalSlices.toLocaleString('fa-IR')}</div><div class="stat-label">کل برش‌ها</div></div>
+      <div class="stat-card"><div class="stat-icon">💎</div><div class="stat-value">${s.totalCoins.toLocaleString('fa-IR')}</div><div class="stat-label">کل سکه‌ها</div></div>
+      <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-value">x${s.bestCombo.toLocaleString('fa-IR')}</div><div class="stat-label">بهترین کمبو</div></div>
+      <div class="stat-card"><div class="stat-icon">🌟</div><div class="stat-value">${s.goldenSliced.toLocaleString('fa-IR')}</div><div class="stat-label">میوه‌های طلایی</div></div>
+      <div class="stat-card"><div class="stat-icon">⏱️</div><div class="stat-value">${h}س ${m}د</div><div class="stat-label">زمان کل بازی</div></div>
+    `;
+  },
+  closeStats() {    document.getElementById('stats-overlay').classList.add('hidden');
+    document.getElementById('menu-overlay').classList.remove('hidden');
+  },
+  openMission() {
+    document.getElementById('menu-overlay').classList.add('hidden');
+    document.getElementById('mission-overlay').classList.remove('hidden');
+    this.updateAllCoinsDisplay();
+    Mission.init(); this.renderMissions();
+  },
+  closeMission() {
+    document.getElementById('mission-overlay').classList.add('hidden');
+    document.getElementById('menu-overlay').classList.remove('hidden');
+  },
+  renderMissions() {
+    const container = document.getElementById('mission-container'); 
+    container.innerHTML = '';
+    const p = Storage.player; 
+    const today = new Date().toDateString();
+    if (p.lastMissionDate !== today) {
+      const m = p.missions || {};
+      for (const id in m) if (!m[id].claimed) m[id] = { progress: 0, completed: false, claimed: false };
+      Storage.set('missions', m); 
+      Storage.set('lastMissionDate', today);
+    }
+    ASSETS.missions.forEach(m => {
+      const data = p.missions?.[m.id] || { progress: 0, completed: false, claimed: false };
+      const pct = Math.min(100, Math.floor((data.progress / m.target) * 100));
+      const card = document.createElement('div');
+      card.className = `mission-card ${data.completed ? 'completed' : ''} ${m.difficulty === 'hard' ? 'challenging' : ''}`;
+      let btn = data.completed && !data.claimed ? `<button class="mission-claim-btn" onclick="Mission.claim(${m.id}, ${m.reward})">🎁 دریافت ${m.reward} 💎</button>` :
+                data.claimed ? '<div class="status-badge status-active">✅ دریافت شد</div>' : '';
+      card.innerHTML = `
+        <div class="mission-title">${m.title}</div>
+        <div class="mission-desc">${m.desc}</div>
+        <div class="mission-progress"><div class="mission-progress-fill" style="width:${pct}%"></div></div>
+        <div style="font-size:14px; color:#aaa; margin-bottom:12px">${data.progress.toLocaleString('fa-IR')} / ${m.target.toLocaleString('fa-IR')}</div>
+        <div class="mission-reward">🎁 جایزه: ${m.reward} 💎</div>
+        ${btn}
+      `;
+      container.appendChild(card);
+    });
+  }
+};
+
+const Mission = {
+  init() { const p = Storage.player; if (!p.missions) Storage.set('missions', {}); },
+  checkProgress(type, val) {
+    const p = Storage.player; 
+    const m = p.missions || {}; 
+    let updated = false;    ASSETS.missions.forEach(miss => {
+      if (miss.type !== type) return;
+      const data = m[miss.id] || { progress: 0, completed: false, claimed: false };
+      if (data.completed) return;
+      let newP = data.progress;
+      if (type === 'sliceFruit' || type === 'sliceGolden' || type === 'activatePower') newP += val;
+      else if (type === 'reachCombo' && val >= miss.target) newP = miss.target;
+      else if (type === 'reachScore' && Game.score >= miss.target) newP = miss.target;
+      if (newP > data.progress) {
+        data.progress = Math.min(newP, miss.target);
+        if (data.progress >= miss.target && !data.completed) {
+          data.completed = true; 
+          UI.notify(`🎉 مأموریت "${miss.title}" کامل شد!`, 'success'); 
+          AudioSystem.play('mission');
+        }
+        m[miss.id] = data; 
+        updated = true;
+      }
+    });
+    if (updated) { 
+      Storage.set('missions', m); 
+      if (!document.getElementById('mission-overlay').classList.contains('hidden')) UI.renderMissions(); 
+    }
+  },
+  claim(id, reward) {
+    if (Storage.claimMissionReward(id)) {
+      Storage.updateCoins(reward);
+      UI.updateAllCoinsDisplay();
+      UI.renderMissions(); 
+      UI.notify(`💎 ${reward} سکه دریافت شد!`, 'success'); 
+      AudioSystem.play('coin');
+    }
+  }
+};
+
+window.addEventListener('load', async () => {
+  await Game.init();
+  document.addEventListener('click', () => AudioSystem.userInteracted(), { once: true });
+});
+document.body.addEventListener('touchmove', e => { if (e.target.closest('#game-canvas')) e.preventDefault(); }, { passive: false });
+</script>
+</body>
+</html>
